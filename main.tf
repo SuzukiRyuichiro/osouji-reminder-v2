@@ -115,7 +115,8 @@ resource "aws_scheduler_schedule" "trash_notification_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "rate(1 days)"
+  # Sun to Thu every night 9:00 PM Japan time
+  schedule_expression = "cron(00 12 ? * 1-5 *)"
 
   target {
     arn      = aws_lambda_function.notify_trash_lambda.arn
