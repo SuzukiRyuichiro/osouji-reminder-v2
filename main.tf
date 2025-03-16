@@ -61,11 +61,20 @@ resource "aws_iam_role_policy_attachment" "scheduler_invoke_lambda_attach" {
   policy_arn = aws_iam_policy.scheduler_invoke_lambda_policy.arn
 }
 
+
 # Lambda function
 data "archive_file" "lambda" {
   type        = "zip"
   source_file = "${path.module}/notify_trash_lambda.py"
   output_path = "notify_trash_lambda_function_src.zip"
+}
+
+data "aws_secretsmanager_secret_version" "line_access_token" {
+  secret_id = "osouji-v2/line_channel_access_token"
+}
+
+data "aws_secretsmanager_secret_version" "recipient_id" {
+  secret_id = "osouji-v2/recipient_id"
 }
 
 resource "aws_lambda_function" "notify_trash_lambda" {
@@ -76,7 +85,16 @@ resource "aws_lambda_function" "notify_trash_lambda" {
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
   runtime = "python3.10"
-  handler = "lambda_handler"
+  handler = "notify_trash_lambda.lambda_handler"
+
+  environment {
+    variables = {
+      LINE_CHANNEL_ACCESS_TOKEN = data.aws_secretsmanager_secret_version.line_access_token.secret_string
+      RECIPIENT_ID              = data.aws_secretsmanager_secret_version.recipient_id.secret_string
+    }
+  }
+
+  layers = [aws_lambda_layer_version.python_dependencies_layer.arn]
 }
 
 # Allow scheduler to invoke lambda
@@ -103,4 +121,19 @@ resource "aws_scheduler_schedule" "trash_notification_schedule" {
     arn      = aws_lambda_function.notify_trash_lambda.arn
     role_arn = aws_iam_role.iam_for_scheduler.arn
   }
+}
+
+# Dependencies
+
+resource "aws_lambda_layer_version" "python_dependencies_layer" {
+  layer_name               = "lambda_layer"
+  filename                 = "python_layer.zip"
+  compatible_architectures = ["x86_64"]
+  compatible_runtimes      = ["python3.10"]
+}
+
+data "archive_file" "python_layer" {
+  type        = "zip"
+  source_dir  = "${path.module}/python_dependencies"
+  output_path = "python_layer.zip"
 }
