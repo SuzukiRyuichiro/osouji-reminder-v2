@@ -94,7 +94,7 @@ resource "aws_lambda_function" "notify_trash_lambda" {
     }
   }
 
-  layers = [aws_lambda_layer_version.python_dependencies_layer.arn]
+  layers = ["arn:aws:lambda:ap-northeast-1:770693421928:layer:Klayers-p310-requests:18"]
 }
 
 # Allow scheduler to invoke lambda
@@ -121,19 +121,4 @@ resource "aws_scheduler_schedule" "trash_notification_schedule" {
     arn      = aws_lambda_function.notify_trash_lambda.arn
     role_arn = aws_iam_role.iam_for_scheduler.arn
   }
-}
-
-# Dependencies
-
-resource "aws_lambda_layer_version" "python_dependencies_layer" {
-  layer_name               = "lambda_layer"
-  filename                 = "python_layer.zip"
-  compatible_architectures = ["x86_64"]
-  compatible_runtimes      = ["python3.10"]
-}
-
-data "archive_file" "python_layer" {
-  type        = "zip"
-  source_dir  = "${path.module}/python_dependencies"
-  output_path = "python_layer.zip"
 }
