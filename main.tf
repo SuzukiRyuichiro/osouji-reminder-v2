@@ -121,5 +121,80 @@ resource "aws_scheduler_schedule" "trash_notification_schedule" {
   target {
     arn      = aws_lambda_function.notify_trash_lambda.arn
     role_arn = aws_iam_role.iam_for_scheduler.arn
+
+    input = jsonencode({
+      identifier = "trash_notification"
+    })
   }
+
+}
+
+resource "aws_scheduler_schedule" "cleaning_duty_schedule" {
+  name       = "cleaning_duty_schedule"
+  group_name = "default"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  # Sun to Thu every night 9:00 PM Japan time
+  schedule_expression = "cron(00 12 ? * 1 *)"
+
+  target {
+    arn      = aws_lambda_function.notify_trash_lambda.arn
+    role_arn = aws_iam_role.iam_for_scheduler.arn
+    input = jsonencode({
+      identifier = "cleaning_duty_schedule"
+    })
+  }
+}
+
+resource "aws_scheduler_schedule" "rent_payment_notification_schedule" {
+  name       = "rent_payment_notification_schedule"
+  group_name = "default"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+
+  # Every month on 24th
+  schedule_expression = "cron(00 3 24 * ? *)"
+
+  target {
+    arn      = aws_lambda_function.notify_trash_lambda.arn
+    role_arn = aws_iam_role.iam_for_scheduler.arn
+    input = jsonencode({
+      identifier = "rent_payment_notification"
+    })
+  }
+}
+
+# logs
+
+data "aws_iam_policy_document" "lambda_logging" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    resources = ["arn:aws:logs:*:*:*"]
+  }
+}
+
+
+resource "aws_iam_policy" "lambda_logging" {
+  name        = "lambda_logging"
+  path        = "/"
+  description = "IAM policy for logging from a lambda"
+  policy      = data.aws_iam_policy_document.lambda_logging.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
 }
