@@ -1,0 +1,1 @@
+Just a fun project to familiarize myself with terraform. It would periodically notify our share house's group chat what trash day it is, who is responsible for what that week, and remind everyone to pay rent every month.
