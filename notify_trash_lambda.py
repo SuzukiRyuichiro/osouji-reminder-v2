@@ -29,7 +29,7 @@ def get_week_number(datetime_str):
 
 
 def get_cleaner_list(week_number):
-    residents = ["高橋", "かえで", "鈴木", "ななこ"]
+    residents = ["{koga}", "{kaede}", "鈴木", "{nanako}"]
     cleaning_tasks = [
         "🚰洗面所＆キッチン🔪",
         "🧹床掃除🧹",
@@ -75,7 +75,7 @@ def compose_message(event):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": "Ue5a2ab006a098b8584a54ff8aa84d055",
+                        "userId": os.environ["KOGA_USER_ID"],
                     },
                 }
             },
@@ -87,7 +87,30 @@ def compose_message(event):
             event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
         )
         message = get_cleaner_list(week_number)
-        return {"type": "textV2", "text": message}
+        return {
+            "type": "textV2",
+            "text": message,
+            "substitution": {
+                "koga": {
+                    "type": "mention",
+                    "mentionee": {"type": "user", "userId": os.environ["KOGA_USER_ID"]},
+                },
+                "kaede": {
+                    "type": "mention",
+                    "mentionee": {
+                        "type": "user",
+                        "userId": os.environ["KAEDE_USER_ID"],
+                    },
+                },
+                "nanako": {
+                    "type": "mention",
+                    "mentionee": {
+                        "type": "user",
+                        "userId": os.environ["NANAKO_USER_ID"],
+                    },
+                },
+            },
+        }
     elif event["identifier"] == "rent_payment_notification":
         return {
             "type": "textV2",

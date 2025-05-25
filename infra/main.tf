@@ -65,20 +65,18 @@ resource "aws_iam_role_policy_attachment" "scheduler_invoke_lambda_attach" {
 # Lambda function
 data "archive_file" "lambda" {
   type        = "zip"
-  source_file = "${path.module}/notify_trash_lambda.py"
-  output_path = "notify_trash_lambda_function_src.zip"
+  source_file = "${path.module}/../notify_trash_lambda.py"
+  output_path = "../notify_trash_lambda_function_src.zip"
 }
 
 data "aws_secretsmanager_secret_version" "line_access_token" {
   secret_id = "osouji-v2/line_channel_access_token"
 }
 
-data "aws_secretsmanager_secret_version" "recipient_id" {
-  secret_id = "osouji-v2/recipient_id"
-}
+
 
 resource "aws_lambda_function" "notify_trash_lambda" {
-  filename      = "notify_trash_lambda_function_src.zip"
+  filename      = "../notify_trash_lambda_function_src.zip"
   function_name = "notify_trash_lambda"
   role          = aws_iam_role.iam_for_lambda.arn
 
@@ -90,10 +88,12 @@ resource "aws_lambda_function" "notify_trash_lambda" {
   environment {
     variables = {
       LINE_CHANNEL_ACCESS_TOKEN = data.aws_secretsmanager_secret_version.line_access_token.secret_string
-      RECIPIENT_ID              = data.aws_secretsmanager_secret_version.recipient_id.secret_string
+      RECIPIENT_ID              = var.recipient_id
+      KAEDE_USER_ID             = var.kaede_user_id
+      KOGA_USER_ID              = var.koga_user_id
+      NANAKO_USER_ID            = var.nanako_user_id
     }
   }
-
   layers = ["arn:aws:lambda:ap-northeast-1:770693421928:layer:Klayers-p310-requests:18"]
 }
 
