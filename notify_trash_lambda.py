@@ -54,15 +54,17 @@ def get_cleaner_list(week_number):
     # Join the lines into a single string
     message = "\n".join(message_lines)
 
-    return message
+    return message, rotated_residents[len(residents) - 1]  # Return the last resident as the cleaner
 
 
 def compose_message(event):
+    cleaner_list_message, cleaner = get_cleaner_list(week_number)
     if event["identifier"] == "trash_notification":
         tomorrow = get_tomorrow(
             event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
         )
         trash_tomorrow = determine_trash(tomorrow)
+
         if trash_tomorrow is None:
             return
 
@@ -75,7 +77,7 @@ def compose_message(event):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["KOGA_USER_ID"],
+                        "userId": os.environ[cleaner.replace("{","").replace("}","").upper() + "_USER_ID"],
                     },
                 }
             },
@@ -86,10 +88,10 @@ def compose_message(event):
         week_number = get_week_number(
             event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
         )
-        message = get_cleaner_list(week_number)
+        
         return {
             "type": "textV2",
-            "text": message,
+            "text": cleaner_list_message,
             "substitution": {
                 "koga": {
                     "type": "mention",
