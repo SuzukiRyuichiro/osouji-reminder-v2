@@ -54,7 +54,7 @@ def get_cleaner_list(week_number):
     # Join the lines into a single string
     message = "\n".join(message_lines)
 
-    return message, rotated_residents[len(residents) - 1]  # Return the last resident as the cleaner
+    return message, rotated_residents[len(residents) - 2]  # Return the last resident as the cleaner
 
 
 def compose_message(event):
