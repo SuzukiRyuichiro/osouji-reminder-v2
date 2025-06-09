@@ -14,3 +14,7 @@ variable "nanako_user_id" {
   description = "nanako's LINE user id"
   type        = string
 }
+variable "ryuichiro_user_id" {
+  description = "ryuichiro's LINE user id"
+  type        = string
+}

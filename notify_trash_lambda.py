@@ -29,7 +29,7 @@ def get_week_number(datetime_str):
 
 
 def get_cleaner_list(week_number):
-    residents = ["{koga}", "{kaede}", "鈴木", "{nanako}"]
+    residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}"]
     cleaning_tasks = [
         "🚰洗面所＆キッチン🔪",
         "🧹床掃除🧹",
@@ -109,6 +109,13 @@ def compose_message(event):
                         "userId": os.environ["NANAKO_USER_ID"],
                     },
                 },
+                "ryuichiro": {
+                    "type": "mention",
+                    "mentionee": {
+                        "type": "user",
+                        "userId": os.environ["RYUICHIRO_USER_ID"]
+                    }
+                }
             },
         }
     elif event["identifier"] == "rent_payment_notification":
