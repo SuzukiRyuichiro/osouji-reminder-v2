@@ -58,9 +58,7 @@ def get_cleaner_list(week_number):
 
 
 def compose_message(event):
-   week_number = get_week_number(
-        event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
-    )
+    week_number = get_week_number(event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")))
     cleaner_list_message, cleaner = get_cleaner_list(week_number)
     if event["identifier"] == "trash_notification":
         tomorrow = get_tomorrow(
@@ -89,7 +87,7 @@ def compose_message(event):
     elif event["identifier"] == "cleaning_duty_schedule":
         # make payload for the cleaning
         )
-        
+
         return {
             "type": "textV2",
             "text": cleaner_list_message,
