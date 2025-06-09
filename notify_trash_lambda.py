@@ -85,9 +85,6 @@ def compose_message(event):
         }
         return payload
     elif event["identifier"] == "cleaning_duty_schedule":
-        # make payload for the cleaning
-        )
-
         return {
             "type": "textV2",
             "text": cleaner_list_message,
