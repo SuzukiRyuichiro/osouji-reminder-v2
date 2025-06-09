@@ -88,8 +88,6 @@ def compose_message(event):
         return payload
     elif event["identifier"] == "cleaning_duty_schedule":
         # make payload for the cleaning
-        week_number = get_week_number(
-            event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
         )
         
         return {
