@@ -29,12 +29,13 @@ def get_week_number(datetime_str):
 
 
 def get_cleaner_list(week_number):
-    residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}"]
+    residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}","{kyoichi}"]
     cleaning_tasks = [
         "🚰洗面所＆キッチン🔪",
-        "🧹床掃除🧹",
+        "🧹床掃除(階段も）🧹",
         "🧺共用のタオル🫧",
-        "🗑️ゴミ捨て🚮",
+        "🗑️ゴミ捨て🚮"
+        "🧼トイレ＆浴室🚽",
     ]
 
     # Calculate the starting index based on the week number
@@ -49,6 +50,7 @@ def get_cleaner_list(week_number):
         f"②{cleaning_tasks[1]}：{rotated_residents[1]}",
         f"③{cleaning_tasks[2]}：{rotated_residents[2]}",
         f"④{cleaning_tasks[3]}：{rotated_residents[3]}",
+        f"⑤{cleaning_tasks[4]}：{rotated_residents[4]}",
     ]
 
     # Join the lines into a single string
@@ -95,7 +97,9 @@ def compose_message(event):
             "substitution": {
                 "koga": {
                     "type": "mention",
-                    "mentionee": {"type": "user", "userId": os.environ["KOGA_USER_ID"]},
+                    "mentionee": {
+                        "type": "user", 
+                        "userId": os.environ["KOGA_USER_ID"]},
                 },
                 "kaede": {
                     "type": "mention",
