@@ -29,7 +29,7 @@ def get_week_number(datetime_str):
 
 
 def get_cleaner_list(week_number):
-    residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}","{kyoichi}"]
+    residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}", "{kyoichi}"]
     cleaning_tasks = [
         "🚰洗面所＆キッチン🔪",
         "🧹床掃除(階段も）🧹",
