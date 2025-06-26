@@ -34,7 +34,7 @@ def get_cleaner_list(week_number):
         "🚰洗面所＆キッチン🔪",
         "🧹床掃除(階段も）🧹",
         "🧺共用のタオル🫧",
-        "🗑️ゴミ捨て🚮"
+        "🗑️ゴミ捨て🚮",
         "🧼トイレ＆浴室🚽",
     ]
 
@@ -119,10 +119,17 @@ def compose_message(event):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["RYUICHIRO_USER_ID"]
+                        "userId": os.environ["RYUICHIRO_USER_ID"],
                     }
-                }
-            },
+                },
+                "kyoichi": {
+                    "type": "mention",
+                    "mentionee": {
+                        "type": "user",
+                        "userId": os.environ["KYOICHI_USER_ID"],
+                    }      
+                },
+            }  
         }
     elif event["identifier"] == "rent_payment_notification":
         return {
