@@ -93,6 +93,7 @@ resource "aws_lambda_function" "notify_trash_lambda" {
       KOGA_USER_ID              = var.koga_user_id
       NANAKO_USER_ID            = var.nanako_user_id
       RYUICHIRO_USER_ID         = var.ryuichiro_user_id
+      KYOICHI_USER_ID           = var.kyoichi_user_id
     }
   }
   layers = ["arn:aws:lambda:ap-northeast-1:770693421928:layer:Klayers-p310-requests:18"]

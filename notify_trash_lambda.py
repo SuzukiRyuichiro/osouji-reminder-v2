@@ -31,11 +31,11 @@ def get_week_number(datetime_str):
 def get_cleaner_list(week_number):
     residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}", "{kyoichi}"]
     cleaning_tasks = [
-        "🚰洗面所＆キッチン🔪",
+        "🍑補欠🍑",
         "🧹床掃除(階段も）🧹",
         "🧺共用のタオル🫧",
-        "🗑️ゴミ捨て🚮",
         "🧼トイレ＆浴室🚽",
+        "🗑️ゴミ捨て🚮",
     ]
 
     # Calculate the starting index based on the week number
@@ -56,12 +56,14 @@ def get_cleaner_list(week_number):
     # Join the lines into a single string
     message = "\n".join(message_lines)
 
-    return message, rotated_residents[len(residents) - 2]  # Return the last resident as the cleaner
+    next_week_cleaner = rotated_residents[len(residents) - 1]
+
+    return message, rotated_residents[len(residents) - 2], next_week_cleaner  # Return the last resident as the cleaner
 
 
 def compose_message(event):
     week_number = get_week_number(event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")))
-    cleaner_list_message, cleaner = get_cleaner_list(week_number)
+    cleaner_list_message, cleaner, next_week_cleaner = get_cleaner_list(week_number)
     if event["identifier"] == "trash_notification":
         tomorrow = get_tomorrow(
             event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
@@ -70,6 +72,8 @@ def compose_message(event):
 
         if trash_tomorrow is None:
             return
+
+        correct_cleaner = next_week_cleaner if tomorrow.weekday() == 0 else cleaner
 
         message = f"{{user}} 明日のゴミは{trash_tomorrow}です。"
         payload = {
@@ -80,7 +84,7 @@ def compose_message(event):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ[cleaner.replace("{","").replace("}","").upper() + "_USER_ID"],
+                        "userId": os.environ[correct_cleaner.replace("{","").replace("}","").upper() + "_USER_ID"],
                     },
                 }
             },
@@ -94,7 +98,7 @@ def compose_message(event):
                 "koga": {
                     "type": "mention",
                     "mentionee": {
-                        "type": "user", 
+                        "type": "user",
                         "userId": os.environ["KOGA_USER_ID"]},
                 },
                 "kaede": {
@@ -123,9 +127,9 @@ def compose_message(event):
                     "mentionee": {
                         "type": "user",
                         "userId": os.environ["KYOICHI_USER_ID"],
-                    }      
+                    }
                 },
-            }  
+            }
         }
     elif event["identifier"] == "rent_payment_notification":
         return {
@@ -172,3 +176,6 @@ def lambda_handler(event, context):
     response = requests.request("POST", url, headers=headers, data=payload)
 
     print(response.text)
+
+
+print(get_tomorrow('2025-05-25T00:00:00Z'))
