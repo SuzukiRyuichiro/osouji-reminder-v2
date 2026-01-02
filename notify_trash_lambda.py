@@ -29,9 +29,9 @@ def get_week_number(datetime_str):
 
 
 def get_cleaner_list(week_number):
-    residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}", "{kyoichi}"]
+    residents = ["{koga}", "{kaede}", "{yasuyo}", "{nanako}", "{kyoichi}"]
     cleaning_tasks = [
-        "🍑補欠🍑",
+        "☘️植木に水やり🪴",
         "🧹床掃除(階段も）🧹",
         "🧺共用のタオル🫧",
         "🧼トイレ＆浴室🚽",
@@ -115,11 +115,11 @@ def compose_message(event):
                         "userId": os.environ["NANAKO_USER_ID"],
                     },
                 },
-                "ryuichiro": {
+                "yasuyo": {
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["RYUICHIRO_USER_ID"],
+                        "userId": os.environ["YASUYO_USER_ID"],
                     }
                 },
                 "kyoichi": {

@@ -22,3 +22,8 @@ variable "kyoichi_user_id" {
   description = "kyoichi's LINE user id"
   type        = string
 }
+
+variable "yasuyo_user_id" {
+  description = "yasuyo's LINE user id"
+  type        = string
+}
