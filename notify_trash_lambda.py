@@ -119,7 +119,7 @@ def compose_message(event):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["YASUYO_USER_ID"],
+                        "userId": os.environ["RYUICHIRO_USER_ID"],
                     }
                 },
                 "kyoichi": {
