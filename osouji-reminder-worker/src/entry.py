@@ -5,10 +5,10 @@ from notify_trash_lambda import compose_message
 class Default(WorkerEntrypoint):
     async def scheduled(self, controller, env, ctx):
         event = {
-            "00 12 ? * 1-5 *": "trash_notification",
-            "00 12 ? * 1 *": "cleaning_duty_schedule",
-            "00 3 24 * ? *": "rent_to_habataku",
-            "00 3 22 * ? *": "rent_to_leader",
+            "0 12 * * mon-fri": "trash_notification",
+            "0 12 * * sun": "cleaning_duty_schedule",
+            "0 3 24 * *": "rent_to_habataku",
+            "0 3 22 * *": "rent_to_leader",
         }[controller.cron]
 
         message = compose_message(event, controller.scheduledTime, self.env)
