@@ -1,6 +1,9 @@
-from workers import WorkerEntrypoint, Response, fetch
 import json
+
+from workers import WorkerEntrypoint, fetch
+
 from notify_trash_lambda import compose_message
+
 
 class Default(WorkerEntrypoint):
     async def scheduled(self, controller, env, ctx):
@@ -24,8 +27,8 @@ class Default(WorkerEntrypoint):
 
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.env.LINE_CHANNEL_SECRET}"
+            "Authorization": f"Bearer {self.env.LINE_CHANNEL_SECRET}",
         }
 
         # Post Method is invoked if data != None
-        return await fetch(url, method='POST', headers=headers, body=payload.encode())
+        return await fetch(url, method="POST", headers=headers, body=payload.encode())
