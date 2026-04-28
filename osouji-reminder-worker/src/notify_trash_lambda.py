@@ -1,8 +1,4 @@
-import os
-import requests
 from datetime import datetime, timedelta, timezone
-import json
-
 
 def get_tomorrow(datetime_str):
     date_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%SZ")
@@ -61,13 +57,12 @@ def get_cleaner_list(week_number):
     return message, rotated_residents[len(residents) - 2], next_week_cleaner  # Return the last resident as the cleaner
 
 
-def compose_message(event):
-    week_number = get_week_number(event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")))
+def compose_message(event, time, env):
+    dt = datetime.fromtimestamp(time / 1000, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    week_number = get_week_number(dt)
     cleaner_list_message, cleaner, next_week_cleaner = get_cleaner_list(week_number)
-    if event["identifier"] == "trash_notification":
-        tomorrow = get_tomorrow(
-            event.get("time", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
-        )
+    if event == "trash_notification":
+        tomorrow = get_tomorrow(dt)
         trash_tomorrow = determine_trash(tomorrow)
 
         if trash_tomorrow is None:
@@ -84,13 +79,13 @@ def compose_message(event):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ[correct_cleaner.replace("{","").replace("}","").upper() + "_USER_ID"],
+                        "userId": env[correct_cleaner.replace("{","").replace("}","").upper() + "_USER_ID"],
                     },
                 }
             },
         }
         return payload
-    elif event["identifier"] == "cleaning_duty_schedule":
+    elif event == "cleaning_duty_schedule":
         return {
             "type": "textV2",
             "text": cleaner_list_message,
@@ -99,44 +94,54 @@ def compose_message(event):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["KOGA_USER_ID"]},
+                        "userId": env.KOGA_USER_ID,
+                    },
                 },
                 "kaede": {
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["KAEDE_USER_ID"],
+                        "userId": env.KAEDE_USER_ID,
                     },
                 },
                 "nanako": {
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["NANAKO_USER_ID"],
+                        "userId": env.NANAKO_USER_ID,
                     },
                 },
                 "yasuyo": {
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["RYUICHIRO_USER_ID"],
+                        "userId": env.RYUICHIRO_USER_ID,
                     }
                 },
                 "kyoichi": {
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": os.environ["KYOICHI_USER_ID"],
+                        "userId": env.KYOICHI_USER_ID,
                     }
-                },
-            }
+                }
+            },
         }
-    elif event["identifier"] == "rent_payment_notification":
+    elif event == "rent_to_habataku":
         return {
             "type": "textV2",
-            "text": "{everyone} 明日25日は家賃の支払日です。忘れないうちに家賃を払いましょう。",
+            "text": "{leader} 明日25日は家賃の支払日です。ハバタクに振り込みましょう",
             "substitution": {
-                "everyone": {"type": "mention", "mentionee": {"type": "all"}}
+                "leader": {"type": "mention", "mentionee": {"type": "user", "userId": env.KAEDE_USER_ID}}
+            },
+        }
+    elif event == "rent_to_leader":
+        return {
+            "type": "textV2",
+            "text": "{everyone} 今日は家賃の支払日です。{leader}に振り込みましょう。",
+            "substitution": {
+                "everyone": {"type": "mention", "mentionee": {"type": "all"}},
+                "leader": {"type": "mention", "mentionee": {"type": "user", "userId": env.KAEDE_USER_ID}}
             },
         }
 
@@ -156,26 +161,3 @@ def determine_trash(date):
             return "㊎ 燃えないゴミ(金属、電池、ガラス、蛍光灯など) Non burnables 🪫"
     elif day_of_week == 4:  # Friday
         return "🧴 資源(紙、缶、瓶、ペットボトルなど) Recyclables 🗞️"
-
-
-def lambda_handler(event, context):
-    url = "https://api.line.me/v2/bot/message/push"
-
-    payload = json.dumps(
-        {
-            "to": "{}".format(os.environ["RECIPIENT_ID"]),
-            "messages": [compose_message(event)],
-        }
-    )
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer {}".format(os.environ["LINE_CHANNEL_ACCESS_TOKEN"]),
-    }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-
-    print(response.text)
-
-
-print(get_tomorrow('2025-05-25T00:00:00Z'))

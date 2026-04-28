@@ -1,0 +1,16 @@
+{
+  "name": "osouji-reminder",
+  "main": "src/entry.py",
+  "compatibility_date": "2026-04-28",
+  "compatibility_flags": ["python_workers"],
+  "observability": {
+    "enabled": true,
+  },
+  "triggers": {
+    "crons": [
+      "00 12 ? * 1-5 *", # trash notification
+      "00 12 ? * 1 *", # cleaning duty
+      "00 3 24 * ? *", # rent
+    ]
+  }
+}
