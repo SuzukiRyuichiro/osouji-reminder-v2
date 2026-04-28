@@ -10,7 +10,8 @@
     "crons": [
       "00 12 ? * 1-5 *", # trash notification
       "00 12 ? * 1 *", # cleaning duty
-      "00 3 24 * ? *", # rent
+      "00 3 24 * ? *", # rent to habataku
+      "00 3 22 * ? *", # rent
     ]
   }
 }
