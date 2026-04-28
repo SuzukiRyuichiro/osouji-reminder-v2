@@ -4,14 +4,20 @@
   "compatibility_date": "2026-04-28",
   "compatibility_flags": ["python_workers"],
   "observability": {
-    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+    },
+    "traces": {
+      "enabled": false,
+    },
   },
   "triggers": {
     "crons": [
-      "00 12 ? * 1-5 *", # trash notification
-      "00 12 ? * 1 *", # cleaning duty
-      "00 3 24 * ? *", # rent to habataku
-      "00 3 22 * ? *", # rent
-    ]
-  }
+      "0 12 * * mon-fri", // trash notification
+      "0 12 * * sun", // cleaning duty
+      "0 3 24 * *", // rent to habataku
+      "0 3 22 * *", // rent
+    ],
+  },
 }
