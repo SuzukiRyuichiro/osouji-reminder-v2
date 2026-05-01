@@ -18,6 +18,10 @@ class Default(WorkerEntrypoint):
 
         url = "https://api.line.me/v2/bot/message/push"
 
+        if message is None:
+            print("No message to send")
+            return
+
         payload = json.dumps(
             {
                 "to": self.env.RECIPIENT_ID,
@@ -31,4 +35,6 @@ class Default(WorkerEntrypoint):
         }
 
         # Post Method is invoked if data != None
-        return await fetch(url, method="POST", headers=headers, body=payload.encode())
+        result = await fetch(url, method="POST", headers=headers, body=payload.encode())
+        print(result)
+        return result
