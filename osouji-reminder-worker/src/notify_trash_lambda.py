@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+
 def get_tomorrow(datetime_str):
     date_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%SZ")
     # Convert the datetime object to Japan Standard Time (JST)
@@ -25,7 +26,7 @@ def get_week_number(datetime_str):
 
 
 def get_cleaner_list(week_number):
-    residents = ["{koga}", "{kaede}", "{yasuyo}", "{nanako}", "{kyoichi}"]
+    residents = ["{koga}", "{kaede}", "{ryuichiro}", "{nanako}", "{kyoichi}"]
     cleaning_tasks = [
         "☘️植木に水やり🪴",
         "🧹床掃除(階段も）🧹",
@@ -54,11 +55,17 @@ def get_cleaner_list(week_number):
 
     next_week_cleaner = rotated_residents[len(residents) - 1]
 
-    return message, rotated_residents[len(residents) - 2], next_week_cleaner  # Return the last resident as the cleaner
+    return (
+        message,
+        rotated_residents[len(residents) - 2],
+        next_week_cleaner,
+    )  # Return the last resident as the cleaner
 
 
 def compose_message(event, time, env):
-    dt = datetime.fromtimestamp(time / 1000, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    dt = datetime.fromtimestamp(time / 1000, tz=timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
     week_number = get_week_number(dt)
     cleaner_list_message, cleaner, next_week_cleaner = get_cleaner_list(week_number)
     if event == "trash_notification":
@@ -70,6 +77,8 @@ def compose_message(event, time, env):
 
         correct_cleaner = next_week_cleaner if tomorrow.weekday() == 0 else cleaner
 
+        print(correct_cleaner.replace("{", "").replace("}", "").upper())
+
         message = f"{{user}} 明日のゴミは{trash_tomorrow}です。"
         payload = {
             "type": "textV2",
@@ -79,7 +88,11 @@ def compose_message(event, time, env):
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
-                        "userId": env[correct_cleaner.replace("{","").replace("}","").upper() + "_USER_ID"],
+                        "userId": getattr(
+                            env,
+                            correct_cleaner.replace("{", "").replace("}", "").upper()
+                            + "_USER_ID",
+                        ),
                     },
                 }
             },
@@ -111,20 +124,20 @@ def compose_message(event, time, env):
                         "userId": env.NANAKO_USER_ID,
                     },
                 },
-                "yasuyo": {
+                "ryuichiro": {
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
                         "userId": env.RYUICHIRO_USER_ID,
-                    }
+                    },
                 },
                 "kyoichi": {
                     "type": "mention",
                     "mentionee": {
                         "type": "user",
                         "userId": env.KYOICHI_USER_ID,
-                    }
-                }
+                    },
+                },
             },
         }
     elif event == "rent_to_habataku":
@@ -132,7 +145,10 @@ def compose_message(event, time, env):
             "type": "textV2",
             "text": "{leader} 明日25日は家賃の支払日です。ハバタクに振り込みましょう",
             "substitution": {
-                "leader": {"type": "mention", "mentionee": {"type": "user", "userId": env.KAEDE_USER_ID}}
+                "leader": {
+                    "type": "mention",
+                    "mentionee": {"type": "user", "userId": env.KAEDE_USER_ID},
+                }
             },
         }
     elif event == "rent_to_leader":
@@ -141,7 +157,10 @@ def compose_message(event, time, env):
             "text": "{everyone} 今日は家賃の支払日です。{leader}に振り込みましょう。",
             "substitution": {
                 "everyone": {"type": "mention", "mentionee": {"type": "all"}},
-                "leader": {"type": "mention", "mentionee": {"type": "user", "userId": env.KAEDE_USER_ID}}
+                "leader": {
+                    "type": "mention",
+                    "mentionee": {"type": "user", "userId": env.KAEDE_USER_ID},
+                },
             },
         }
 
